@@ -46,6 +46,7 @@ awk '$5 > 1' S5.sam > S5_uniq.sam
 cd tabulate_insertions_S5/
 ```
 ## must use python2, I used v2.7.12_anaconda4.2, biopython v.1.61
+## tabulate insertions after the first 5% and before the last 20% of the gene = same parameters used in Sarmiento et. al.
 ```
 python tabulate_insertions8.py MMS2.gbk ~/tnseq01/concat/trim_02/bowtie2/S5_uniq_bowtie2.hits.txt 'MMP' 0.05 0.20
 ```
