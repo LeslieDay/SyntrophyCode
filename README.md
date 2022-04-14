@@ -1,10 +1,11 @@
-# Tn5_Analysis
+# Tn5 _M. maripaludis_ S2 library analysis 
+## Tn5 Library from [Genome-scale analysis of gene function in the hydrogenotrophic methanogenic archaeon Methanococcus maripaludis, Sarmiento et. al. 2013](https://www.pnas.org/doi/10.1073/pnas.1220225110) 
 
-# Parameters used for trimming transposon data 
-# trimmed reads saved in /panfs/roc/groups/2/kcosta/day00094/tnseq01/concat/trim_02
-This is cutadapt 1.18 with Python 3.7.2
-Command line parameters: -j 0 -m 30 --pair-filter=any --nextseq-trim=30 -u 27 -U 27 -g GGTTGAGATGTGTATAAGAGACNG -g CTACAAGAGCGGTGAG -a ACTCACCGCTCTTGTAG -a CTGTCTCTTATA -A CTGTCTCTTATA -o S2_R1.fastq.gz -p S2_R2.fastq.gz /panfs/roc/groups/2/kcosta/day00094/tnseq01/concat/S2_R1.fastq.gz /panfs/roc/groups/2/kcosta/day00094/tnseq01/concat/S2_R2.fastq.gz
-
+## Parameters used for trimming transposon sequencing  
+## Performed using cutadapt 1.18 with Python 3.7.2
+```
+cutadapt -j 0 -m 30 --pair-filter=any --nextseq-trim=30 -u 27 -U 27 -g GGTTGAGATGTGTATAAGAGACNG -g CTACAAGAGCGGTGAG -a ACTCACCGCTCTTGTAG -a CTGTCTCTTATA -A CTGTCTCTTATA -o S5_R1.fastq.gz -p S5_R2.fastq.gz S5_R1.fastq.gz S5_R2.fastq.gz
+```
 ### cutadapt use all available cores
 -j 0 
 ### discard all reads <30 bp 
@@ -22,19 +23,29 @@ Command line parameters: -j 0 -m 30 --pair-filter=any --nextseq-trim=30 -u 27 -U
 -g CTACAAGAGCGGTGAG -a ACTCACCGCTCTTGTAG
 ### remove Nextera transposase sequence from R1 and R2 reads
 -a CTGTCTCTTATA -A CTGTCTCTTATA
-# done
 
-# map remaining reads to _M. maripaludis_ S2 genome using bowtie2 v2.3.4.1
+
+## map remaining reads to _M. maripaludis_ S2 genome using bowtie2 v2.3.4.1
+```
 bowtie2 -x MM_index -1 ~/tnseq01/concat/trim_02/S5_R1.fastq.gz -2 ~/tnseq01/concat/trim_02/S5_R2.fastq.gz -S S5.sam
-# check quality of mapping 
+```
+## check quality of mapping, samtools v.1.9
+```
 samtools stats S5.sam > S5_stats
-
-# pull reads that only map to a single location 
+```
+## pull reads that only map to a single location 
+```
 awk '$5 > 1' S5.sam > S5_uniq.sam
-
-# generate hit file that compiles the insertion counts 
+```
+# following one liner and tabulation script ammended from the incredibly helpful [Jon Badalmenti](https://github.com/jbadomics/tnseq)
+## generate hit file that compiles the insertion counts 
+```
 /panfs/roc/groups/2/kcosta/day00094/bin/bioawk/bioawk -c sam '{ if($flag==99) print $qname,$rname,$flag,$pos,$pos+1,length($seq); if($flag==83) print $qname,$rname,$flag,$pos,$pos+length($seq)-1,length($seq) }' ~/tnseq01/concat/trim_02/bowtie2/S5_uniq.sam | cut -f2,5 | sort -g -k2 | uniq -c | sed 's/^ *//' | awk -v OFS='\t' '{ print $2,$3,$1}' > S5_uniq_bowtie2.hits.txt
-
+```
+```
 cd tabulate_insertions_S5/
-# must use python2 v2.7.12_anaconda4.2
+```
+## must use python2, I used v2.7.12_anaconda4.2, biopython v.1.61
+```
 python tabulate_insertions8.py MMS2.gbk ~/tnseq01/concat/trim_02/bowtie2/S5_uniq_bowtie2.hits.txt 'MMP' 0.05 0.20
+```
