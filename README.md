@@ -1,3 +1,6 @@
+# Barcode ratio count
+### script and parameters used for analysis of barcode ratio competition experiments found in CountBarcodes.md
+
 # Tn5 _M. maripaludis_ S2 library analysis 
 ## Tn5 Library from [Genome-scale analysis of gene function in the hydrogenotrophic methanogenic archaeon Methanococcus maripaludis, Sarmiento et. al. 2013](https://www.pnas.org/doi/10.1073/pnas.1220225110) 
 
